@@ -20,7 +20,7 @@ class Rack::ESI
 
     status, headers, enumerable_body = original_response = @app.call(env)
 
-    return original_response unless headers["Content-Type"].to_s.match(/(ht|x)ml/) # FIXME: Use another pattern
+    return original_response unless headers["Content-Type"].to_s.match(/^text\/(?:ht|x)ml/)
 
     body = join_body(enumerable_body)
 
