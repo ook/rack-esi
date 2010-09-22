@@ -31,7 +31,7 @@ class Rack::ESI
 
     xml.search("esi:include") do |include_element|
       raise(Error, "esi:include without @src") unless include_element["src"]
-      raise(Error, "esi:include[@src] must be absolute") unless include_element["src"][0] == ?/
+      raise(Error, "esi:include[@src] must be absolute (and #{include_element["src"].inspect} is not…)") unless include_element["src"] =~ /https?\:\/\//i
       
       src = include_element["src"]
 
