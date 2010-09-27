@@ -33,20 +33,22 @@ class Rack::ESI
       raise(Error, 'esi:include without @src') unless include_element["src"]
       raise(Error, "esi:include[@src] must be absolute (and #{include_element["src"].inspect} is not…)") unless include_element["src"] =~ /^(?:https?\:\/)?\//i
       
-      src = include_element["src"]
+      uri = URI::parse(include_element['src'])
 
-      # TODO: Test this      
-      include_env = env.merge({
-        "PATH_INFO"      => src,
-        "QUERY_STRING"   => "",
-        "REQUEST_METHOD" => "GET",
-        "SCRIPT_NAME"    => ""
+      env.merge!({
+        'REQUEST_METHOD' => 'GET',
+        'SCRIPT_NAME'    => '',
+        'PATH_INFO'      => uri.path,
+        'QUERY_STRING'   => uri.query || '',
+        'SERVER_NAME'    => env['SERVER_NAME'], # never *EVER* try to cross-site…
+        'SERVER_PORT'    => env['SERVER_PORT'], # never *EVER* try to cross-site…
+        'rails.esi.action' => uri.path.split('/')[2], # NOTE since PATH_INFO has just no effect for the action (:index is always requested), put some info in env…
       })
-      include_env.delete("HTTP_ACCEPT_ENCODING")
-      include_env.delete("REQUEST_PATH")
-      include_env.delete("REQUEST_URI")
       
-      include_status, include_headers, include_body = include_response = process_request(include_env, level + 1)
+      env.delete("HTTP_ACCEPT_ENCODING")
+      env.delete('REQUEST_PATH')
+      env.delete('REQUEST_URI')
+      include_status, include_headers, include_body = include_response = process_request(env, level + 1)
       
       raise(Error, "#{include_element["src"]} request failed (code: #{include_status})") unless include_status == 200
       
