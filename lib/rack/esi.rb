@@ -21,7 +21,7 @@ class Rack::ESI
 
     status, headers, enumerable_body = original_response = @app.call(env)
 
-    return original_response unless headers["Content-Type"].to_s.match(/^text\/(?:ht|x)ml/)
+    return original_response unless headers['Content-Type'].to_s.match(/^text\/(?:ht|x)ml/)
 
     body = join_body(enumerable_body)
 
@@ -29,9 +29,9 @@ class Rack::ESI
 
     xml = Hpricot.XML(body)
 
-    xml.search("esi:include") do |include_element|
-      raise(Error, "esi:include without @src") unless include_element["src"]
-      raise(Error, "esi:include[@src] must be absolute (and #{include_element["src"].inspect} is not…)") unless include_element["src"] =~ /https?\:\/\//i
+    xml.search('esi:include') do |include_element|
+      raise(Error, 'esi:include without @src') unless include_element["src"]
+      raise(Error, "esi:include[@src] must be absolute (and #{include_element["src"].inspect} is not…)") unless include_element["src"] =~ /^(?:https?\:\/)?\//i
       
       src = include_element["src"]
 
