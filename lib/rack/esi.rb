@@ -1,5 +1,6 @@
-require "rack"
-require "hpricot"
+require 'uri'
+require 'rack'
+require 'hpricot'
 
 class Rack::ESI
   class Error < ::RuntimeError
@@ -25,7 +26,7 @@ class Rack::ESI
 
     body = join_body(enumerable_body)
 
-    return original_response unless body.include?("<esi:")
+    return original_response unless body.include?('<esi:')
 
     xml = Hpricot.XML(body)
 
