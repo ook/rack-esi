@@ -40,15 +40,12 @@ class Rack::ESI
         'REQUEST_METHOD' => 'GET',
         'SCRIPT_NAME'    => '',
         'PATH_INFO'      => uri.path,
+        'REQUEST_URI'    => uri.path,
         'QUERY_STRING'   => uri.query || '',
         'SERVER_NAME'    => env['SERVER_NAME'], # never *EVER* try to cross-site…
         'SERVER_PORT'    => env['SERVER_PORT'], # never *EVER* try to cross-site…
         'rails.esi.action' => uri.path.split('/')[2], # NOTE since PATH_INFO has just no effect for the action (:index is always requested), put some info in env…
       })
-      
-      env.delete("HTTP_ACCEPT_ENCODING")
-      env.delete('REQUEST_PATH')
-      env.delete('REQUEST_URI')
       include_status, include_headers, include_body = include_response = process_request(env, level + 1)
       
       raise(Error, "#{include_element["src"]} request failed (code: #{include_status})") unless include_status == 200
